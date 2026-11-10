@@ -1,0 +1,122 @@
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, ArrowRight, Layers3, PanelsTopLeft, LayoutDashboard, Workflow, Gauge, Check, Menu, X, Users, FolderKanban, ChartNoAxesCombined, Search, Bell, Mail } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+
+const CONTACT_EMAIL = 'manglvisha@gmail.com';
+
+const services = [
+  {icon:PanelsTopLeft,title:'Figma to frontend',text:'Turn approved designs into responsive, production-ready React and Next.js interfaces.'},
+  {icon:LayoutDashboard,title:'SaaS dashboards',text:'Build dashboards, admin panels and application workflows with reusable components.'},
+  {icon:Workflow,title:'API integration',text:'Connect frontend experiences to existing services with thoughtful loading and error states.'},
+  {icon:Gauge,title:'Ongoing frontend support',text:'Add dependable engineering capacity for features, improvements and maintenance.'}
+];
+const steps = [
+  ['01','Understand','We review your designs, requirements, codebase and delivery expectations.'],
+  ['02','Scope','We agree on deliverables, dependencies, milestones and pricing before development.'],
+  ['03','Build','We implement clean, reusable interfaces and keep your team informed.'],
+  ['04','Review','We demo progress, incorporate agreed feedback and validate requirements.'],
+  ['05','Handover','You receive the code, repository updates and a clear handover.']
+];
+
+const reveal = {
+  hidden: { opacity: 0, y: 26 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const } }
+};
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.11 } }
+};
+
+function Preview(){
+ return <div className="relative rounded-2xl border border-white/10 bg-[#111927] p-3 shadow-2xl">
+  <div className="flex items-center gap-2 border-b border-white/10 px-2 pb-3"><span className="h-2 w-2 rounded-full bg-red-400"/><span className="h-2 w-2 rounded-full bg-yellow-400"/><span className="h-2 w-2 rounded-full bg-green-400"/><span className="ml-3 rounded bg-white/5 px-3 py-1 text-[9px] text-slate-400">app.nexora.demo / overview</span><span className="ml-auto text-[9px] text-slate-500">DEMO PREVIEW</span></div>
+  <div className="grid grid-cols-[105px_1fr] gap-3 pt-3">
+   <aside className="hidden space-y-5 rounded-xl bg-white/[.035] p-3 sm:block"><div className="flex items-center gap-2 text-xs font-bold"><span className="rounded bg-blue-500 p-1"><Layers3 size={13}/></span>NEXORA</div><div className="space-y-3 text-[9px] text-slate-400"><div className="flex gap-2 text-blue-300"><LayoutDashboard size={12}/> Overview</div><div className="flex gap-2"><Users size={12}/> Clients</div><div className="flex gap-2"><FolderKanban size={12}/> Projects</div><div className="flex gap-2"><ChartNoAxesCombined size={12}/> Reports</div></div></aside>
+   <div className="min-w-0 space-y-3"><div className="flex items-center justify-between"><div><div className="text-[8px] uppercase tracking-widest text-slate-500">Workspace overview</div><div className="mt-1 text-sm font-semibold text-white">Good morning, Alex</div></div><div className="flex gap-2 text-slate-400"><Search size={13}/><Bell size={13}/></div></div>
+    <div className="grid grid-cols-3 gap-2">{[['Revenue','$48,290'],['Active clients','284'],['Projects','36']].map(x=><div key={x[0]} className="rounded-xl border border-white/10 bg-white/[.035] p-2"><div className="text-[8px] text-slate-500">{x[0]}</div><div className="mt-1 text-sm font-bold text-white">{x[1]}</div><div className="mt-1 text-[8px] text-emerald-400">+12.8% this month</div></div>)}</div>
+    <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="text-[10px] font-semibold text-white">Performance overview</div><div className="mt-4 flex h-28 items-end gap-1.5">{[35,48,42,65,55,78,63,88,72,96,76,100,82,91,74,100,86,94].map((h,i)=><div key={i} className="flex-1 rounded-t bg-blue-400" style={{height:h+'%',opacity:.55+(i%4)*.12}}/>)}</div><div className="mt-2 flex justify-between text-[7px] text-slate-600"><span>OCT 12</span><span>OCT 19</span><span>OCT 26</span><span>NOV 10</span></div></div>
+    <div className="rounded-xl border border-white/10 bg-white/[.035] p-3"><div className="mb-2 text-[10px] font-semibold text-white">Recent projects</div>{[['Website redesign','72%'],['Mobile experience','88%'],['Analytics portal','46%']].map(x=><div key={x[0]} className="flex items-center gap-2 border-t border-white/5 py-2"><div className="h-4 w-4 rounded bg-blue-500/20"/><span className="flex-1 text-[8px] text-slate-300">{x[0]}</span><span className="text-[8px] text-slate-500">{x[1]}</span></div>)}</div>
+   </div>
+  </div>
+ </div>
+}
+export default function Home(){
+ const [open,setOpen]=useState(false);
+ const menuTriggerRef=useRef<HTMLButtonElement>(null);
+ const drawerRef=useRef<HTMLElement>(null);
+ const shouldReduceMotion = useReducedMotion();
+ const [form,setForm]=useState({name:'',email:'',agency:'',details:''});
+ const [sent,setSent]=useState(false);
+ useEffect(()=>{
+  if(!open)return;
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow='hidden';
+  const handleKeyDown=(event:KeyboardEvent)=>{
+   if(event.key==='Escape'){
+    setOpen(false);
+    return;
+   }
+   if(event.key!=='Tab')return;
+   const focusable=drawerRef.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled])');
+   if(!focusable?.length)return;
+   const first=focusable[0];
+   const last=focusable[focusable.length-1];
+   if(event.shiftKey&&document.activeElement===first){
+    event.preventDefault();
+    last.focus();
+   }else if(!event.shiftKey&&document.activeElement===last){
+    event.preventDefault();
+    first.focus();
+   }
+  };
+  window.addEventListener('keydown',handleKeyDown);
+  drawerRef.current?.querySelector<HTMLElement>('button, a[href]')?.focus();
+  return ()=>{
+   document.body.style.overflow=previousOverflow;
+   window.removeEventListener('keydown',handleKeyDown);
+   menuTriggerRef.current?.focus();
+  };
+ },[open]);
+ const change=(key:keyof typeof form,value:string)=>setForm(v=>({...v,[key]:value}));
+ const submit=(e:React.FormEvent)=>{e.preventDefault();const subject=encodeURIComponent('Project enquiry from '+form.name);const body=encodeURIComponent('Name: '+form.name+'\nEmail: '+form.email+'\nAgency: '+form.agency+'\nProject: '+form.details);window.location.href=`mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;setSent(true)};
+ return <main className="overflow-hidden">
+  <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#10141d]/80 backdrop-blur-xl"><div className="wrap flex h-[76px] items-center justify-between"><a href="#" className="flex items-center gap-2.5 text-white"><span className="grid h-9 w-9 place-items-center rounded-xl border border-white/15 bg-white/[.07]"><Layers3 size={18} className="text-blue-300"/></span><span className="text-[15px] font-extrabold tracking-tight">LAYERPILOT <small className="ml-1 text-[9px] tracking-[.2em] text-slate-400">STUDIO</small></span></a><nav className="hidden gap-8 text-xs text-slate-300 md:flex"><a href="#services">Services</a><a href="#work">Work</a><a href="#process">Process</a><a href="#about">About</a></nav><a href="#contact" className="hidden items-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold text-[#10141d] md:flex">Let's talk <ArrowUpRight size={14}/></a><button ref={menuTriggerRef} type="button" className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/[.06] text-white transition-colors hover:bg-white/10 md:hidden" onClick={()=>setOpen(!open)} aria-label={open?'Close navigation menu':'Open navigation menu'} aria-expanded={open} aria-controls="mobile-navigation">{open?<X size={20}/>:<Menu size={20}/>}</button></div></header>
+  <AnimatePresence>
+   {open&&<>
+    <motion.button type="button" aria-label="Close navigation menu" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:shouldReduceMotion?0:0.2}} className="fixed inset-0 z-[60] cursor-default bg-black/60 backdrop-blur-[2px] md:hidden" onClick={()=>setOpen(false)}/>
+    <motion.aside ref={drawerRef} id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Mobile navigation" initial={shouldReduceMotion?false:{x:'-100%'}} animate={{x:0}} exit={{x:'-100%'}} transition={{duration:shouldReduceMotion?0:0.32,ease:[0.22,1,0.36,1]}} className="fixed inset-y-0 left-0 z-[61] flex w-[min(88vw,380px)] flex-col overflow-y-auto border-r border-white/10 bg-[#10141d] px-6 pb-7 pt-6 text-white shadow-2xl md:hidden">
+     <div className="flex items-center justify-between">
+      <a href="#" onClick={()=>setOpen(false)} className="flex items-center gap-2.5" aria-label="Layerpilot Studio home"><span className="grid h-10 w-10 place-items-center rounded-xl border border-white/15 bg-white/[.07]"><Layers3 size={19} className="text-blue-300"/></span><span className="text-sm font-extrabold tracking-tight">LAYERPILOT <small className="ml-1 text-[9px] tracking-[.2em] text-slate-400">STUDIO</small></span></a>
+      <button type="button" onClick={()=>setOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Close navigation"><X size={19}/></button>
+     </div>
+     <div className="mt-12">
+      <p className="text-[10px] font-bold uppercase tracking-[.2em] text-blue-300">Explore Layerpilot</p>
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight">Where can we help?</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-400">A frontend partner for the work you want to ship.</p>
+     </div>
+     <nav aria-label="Mobile navigation links" className="mt-8">
+      {[
+       ['01','Services','services'],
+       ['02','Selected work','work'],
+       ['03','Our process','process'],
+       ['04','About us','about']
+      ].map(([number,label,section])=><a key={section} href={`#${section}`} onClick={()=>setOpen(false)} className="group flex items-center gap-4 border-b border-white/[.08] py-4 transition-colors hover:text-blue-200"><span className="text-[10px] font-semibold tracking-widest text-slate-500">{number}</span><span className="flex-1 text-base font-medium">{label}</span><ArrowUpRight size={16} className="text-slate-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-blue-300"/></a>)}
+     </nav>
+     <div className="mt-auto pt-9">
+      <div className="mb-5 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.04] p-4"><span className="relative flex h-2.5 w-2.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-50"/><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-400"/></span><div><p className="text-xs font-semibold">React & Next.js engineering</p><p className="mt-1 text-[10px] text-slate-400">Agency-first. Built to fit your workflow.</p></div></div>
+      <a href="#contact" onClick={()=>setOpen(false)} className="flex w-full items-center justify-between rounded-full bg-[#4D7CFE] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500">Let&apos;s talk about your project <ArrowUpRight size={17}/></a>
+      <p className="mt-4 text-center text-[10px] text-slate-500">Clear scope. Direct engineer access. No pressure.</p>
+     </div>
+    </motion.aside>
+   </>}
+  </AnimatePresence>
+  <section className="gridbg relative min-h-[730px] bg-[#10141d] pb-24 pt-36 text-white"><div className="absolute -right-24 top-20 h-[480px] w-[480px] rounded-full bg-blue-500/20 blur-[110px]"/><div className="wrap relative grid items-center gap-14 lg:grid-cols-[.9fr_1.1fr]"><motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-xl"><motion.div variants={reveal} className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[9px] font-bold tracking-widest text-blue-200"><span className="h-1.5 w-1.5 rounded-full bg-blue-400"/> WHITE-LABEL FRONTEND ENGINEERING</motion.div><motion.h1 variants={reveal} className="text-[clamp(3.2rem,6.5vw,5.6rem)] font-semibold leading-[.99] tracking-[-.075em]">Your frontend team, <span className="text-blue-400">behind the scenes.</span></motion.h1><motion.p variants={reveal} className="mt-7 max-w-md text-[15px] leading-7 text-slate-300">We help digital agencies ship exceptional web products through reliable React and Next.js engineering—without adding permanent headcount.</motion.p><motion.div variants={reveal} className="mt-9 flex flex-wrap gap-3"><a href="#contact" className="inline-flex items-center gap-3 rounded-full bg-[#4D7CFE] px-6 py-3.5 text-xs font-bold text-white">Discuss a project <ArrowUpRight size={15}/></a><a href="#work" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-xs font-semibold">Explore our work <ArrowRight size={14}/></a></motion.div><motion.div variants={reveal} className="mt-12 flex flex-wrap gap-5 text-[10px] text-slate-400"><span className="flex items-center gap-2"><Check size={13} className="text-blue-400"/> React & Next.js</span><span className="flex items-center gap-2"><Check size={13} className="text-blue-400"/> Agency-first workflow</span><span className="flex items-center gap-2"><Check size={13} className="text-blue-400"/> Direct engineer access</span></motion.div></motion.div><motion.div initial={shouldReduceMotion ? false : { opacity: 0, y: 24, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }} whileHover={shouldReduceMotion ? undefined : { y: -7 }}><Preview/></motion.div></div><div className="wrap relative mt-24 flex flex-wrap justify-between gap-4 border-t border-white/10 pt-7 text-[9px] font-semibold tracking-widest text-slate-500"><span>BUILT FOR AGENCIES THAT SHIP</span><span>DESIGN-LED IMPLEMENTATION</span><span>PRODUCT-GRADE FRONTENDS</span><span>FLEXIBLE COLLABORATION</span></div></section>
+  <section id="services" className="wrap py-28"><div className="max-w-2xl"><div className="eyebrow text-blue-600">What we do</div><h2 className="mt-5 text-4xl font-semibold md:text-5xl">Frontend engineering that fits into your workflow.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">We work alongside agencies as an extension of their delivery team, helping turn designs and requirements into polished, production-ready interfaces.</p></div><motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.18 }} className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{services.map(({icon:Icon,title,text},i)=><motion.article variants={reveal} whileHover={shouldReduceMotion ? undefined : { y: -7 }} transition={{ duration: 0.25 }} key={title} className="rounded-2xl border border-black/10 bg-white p-6 transition-shadow hover:shadow-xl"><div className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-600"><Icon size={20}/></div><div className="mt-8 text-[10px] font-bold tracking-widest text-slate-400">0{i+1}</div><h3 className="mt-2 text-lg font-bold">{title}</h3><p className="mt-3 text-[13px] leading-6 text-slate-600">{text}</p></motion.article>)}</motion.div></section>
+  <section id="work" className="bg-white py-28"><div className="wrap"><div className="eyebrow text-blue-600">Selected work</div><h2 className="mt-5 text-4xl font-semibold md:text-5xl">Thoughtful interfaces.<br/>Solid engineering.</h2><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={reveal} className="mt-12 overflow-hidden rounded-[28px] bg-[#111927] p-6 text-white md:p-10"><div className="grid items-center gap-9 lg:grid-cols-[.7fr_1.3fr]"><div><span className="rounded-full border border-blue-400/30 bg-blue-400/10 px-3 py-1.5 text-[9px] font-bold tracking-widest text-blue-300">SELF-INITIATED DEMO</span><h3 className="mt-7 text-4xl font-extrabold">NEXORA</h3><p className="mt-3 text-sm leading-6 text-slate-300">A modern operations platform concept built to demonstrate complex SaaS frontend implementation.</p><div className="mt-6 flex flex-wrap gap-2">{['Next.js','TypeScript','Tailwind','Recharts'].map(t=><span key={t} className="rounded-full border border-white/10 px-3 py-1.5 text-[9px] text-slate-300">{t}</span>)}</div><p className="mt-7 text-[11px] leading-5 text-slate-400">Dashboard · Client management · Projects · Team workflows</p></div><Preview/></div></motion.div><div className="mt-5 grid gap-5 md:grid-cols-2"><motion.article variants={reveal} whileHover={shouldReduceMotion ? undefined : { y: -5 }} className="rounded-2xl border border-black/10 bg-[#f5f6f8] p-7"><div className="eyebrow text-blue-600">Product experience</div><h3 className="mt-4 text-2xl font-bold">NEETUp</h3><p className="mt-3 text-[13px] leading-6 text-slate-600">An AI-powered learning experience built around topic-based practice, explanations and mock assessments.</p><div className="mt-5 text-[10px] text-slate-500">React · AI integration · API workflows</div></motion.article><motion.article variants={reveal} whileHover={shouldReduceMotion ? undefined : { y: -5 }} className="rounded-2xl border border-black/10 bg-[#f5f6f8] p-7"><div className="eyebrow text-blue-600">Ordering experience</div><h3 className="mt-4 text-2xl font-bold">MezMitra</h3><p className="mt-3 text-[13px] leading-6 text-slate-600">A QR-based multi-vendor ordering concept designed to simplify food-court ordering.</p><div className="mt-5 text-[10px] text-slate-500">Next.js · Product UI · Ordering workflows</div></motion.article></div><p className="mt-5 text-[10px] leading-5 text-slate-400">Project descriptions should accurately reflect your contribution. NEXORA is a self-initiated demo, not a client engagement.</p></div></section>
+  <section id="process" className="wrap py-28"><div className="eyebrow text-blue-600">How we work</div><h2 className="mt-5 text-4xl font-semibold md:text-5xl">Easy to work with.<br/>Serious about delivery.</h2><motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="mt-14 grid gap-9 sm:grid-cols-2 lg:grid-cols-5">{steps.map(([n,t,d])=><motion.div variants={reveal} key={n} className="border-t border-black/15 pt-5"><div className="text-[11px] font-bold text-blue-600">{n}</div><h3 className="mt-5 text-xl font-bold">{t}</h3><p className="mt-3 text-xs leading-6 text-slate-600">{d}</p></motion.div>)}</motion.div></section>
+  <section id="about" className="bg-[#e9edf5] py-24"><div className="wrap grid gap-12 md:grid-cols-[.8fr_1.2fr] md:items-center"><div><div className="eyebrow text-blue-600">Why Layerpilot</div><h2 className="mt-5 text-4xl font-semibold md:text-5xl">An engineering partner, not another layer of management.</h2></div><motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="grid gap-3 sm:grid-cols-2">{['Direct access to the engineer building your project','Flexible engagement without permanent hiring','Clear milestones and transparent scope','Maintainable code and reusable components','Communication that fits your workflow','White-label collaboration under your brand'].map(x=><motion.div variants={reveal} key={x} className="flex gap-3 rounded-xl bg-white/70 p-4 text-[13px] leading-6 text-slate-700"><Check size={16} className="mt-1 shrink-0 text-blue-600"/>{x}</motion.div>)}</motion.div></div></section>
+  <section id="contact" className="bg-[#10141d] py-28 text-white"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.12 }} variants={stagger} className="wrap grid gap-14 lg:grid-cols-[.9fr_1.1fr]"><motion.div variants={reveal}><div className="eyebrow text-blue-300">Start a conversation</div><h2 className="mt-5 text-4xl font-semibold md:text-5xl">Have a frontend project on your plate?</h2><p className="mt-6 max-w-md text-sm leading-7 text-slate-300">Share your designs, project brief or current delivery bottleneck. We'll review the scope and suggest a practical next step.</p><a href={`mailto:${CONTACT_EMAIL}`} className="mt-9 inline-flex items-center gap-3 text-sm text-slate-300 transition hover:text-white"><Mail size={15} className="text-blue-300"/>{CONTACT_EMAIL}</a></motion.div><motion.div variants={reveal}><form onSubmit={submit} className="rounded-2xl border border-white/10 bg-white/[.045] p-6 md:p-8"><div className="grid gap-5 sm:grid-cols-2">{(['name','email'] as const).map(k=><label key={k} className="text-[11px] font-semibold text-slate-300">{k==='name'?'Your name':'Work email'}<input required type={k==='email'?'email':'text'} value={form[k]} onChange={e=>change(k,e.target.value)} placeholder={k==='name'?'Alex Morgan':'alex@agency.com'} className="mt-2 w-full rounded-lg border border-white/10 bg-white/[.06] px-4 py-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-blue-400"/></label>)}</div><label className="mt-5 block text-[11px] font-semibold text-slate-300">Agency / company<input value={form.agency} onChange={e=>change('agency',e.target.value)} placeholder="Your agency name" className="mt-2 w-full rounded-lg border border-white/10 bg-white/[.06] px-4 py-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-blue-400"/></label><label className="mt-5 block text-[11px] font-semibold text-slate-300">What are you building?<textarea required rows={4} value={form.details} onChange={e=>change('details',e.target.value)} placeholder="Tell us about the project, timeline and frontend support you need..." className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-white/[.06] px-4 py-3 text-xs text-white outline-none placeholder:text-slate-600 focus:border-blue-400"/></label><button className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#4D7CFE] px-6 py-3.5 text-xs font-bold text-white">Send project enquiry <ArrowUpRight size={15}/></button>{sent&&<p className="mt-3 text-xs text-blue-200">Your email app should open with a draft addressed to {CONTACT_EMAIL}.</p>}<p className="mt-3 text-center text-[9px] text-slate-500">No pressure. Just a practical conversation about your project.</p></form></motion.div></motion.div></section>
+  <footer className="bg-[#0b1019] py-8 text-white"><div className="wrap flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div className="text-xs font-extrabold tracking-tight">LAYERPILOT <span className="text-[9px] tracking-widest text-slate-500">STUDIO</span></div><p className="text-[10px] text-slate-500">White-label React & Next.js frontend engineering for digital agencies.</p><p className="text-[10px] text-slate-600">© {new Date().getFullYear()} Layerpilot Studio</p></div></footer>
+ </main>
+}
